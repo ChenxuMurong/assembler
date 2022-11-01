@@ -197,7 +197,7 @@ def main():
         lineNum = 0
         while len(line) != 0:
             # addr number padded to 4 digits
-            code += "\"" +  translate(line) + "\"" + " when addr = \"{0:0<4b}\" else".format(lineNum)
+            code += "\"" +  translate(line) + "\"" + " when addr = \"{0:0>4b}\" else".format(lineNum)
             # add annotation to code
             code += " -- " + line + "\n"
             line = file.readline().strip()
