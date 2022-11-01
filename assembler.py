@@ -21,11 +21,6 @@ bin [add/sub/shift/xor/and/rotate] [src] [to/from/left/right/with] [dest]
 branch [to] xxxx
 branch [to] xxxx if src == 0
 
-
-Known Issue
-
-The current assembler can only concatenate the "when...else..." boilerplate statement with the 10-bit assembly code. It doesn't know when to stop using the boilerplate and put a semicolon after the assembly code.
-Please make sure to cut out the trailing "when ... else" statement and replace it with a semicolon in compliance with VHDL standard.
 '''
 
 
@@ -202,7 +197,7 @@ def main():
             code += " -- " + line + "\n"
             line = file.readline().strip()
             lineNum += 1
-
+        code += "\"1111111111\"; -- garbage"
         print(code)
 
 
