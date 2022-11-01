@@ -2,24 +2,31 @@
 Author Baron Wang
 Assembler that translates English to Assembly code for CS232 Proj 5
 
-Usage: python3 assembler.py
-type in english command then hit enter
-the program will return the translated 10-bit code 
-or error message if appropriate
+Usage: 
 
-Syntax : 
+python3 assembler.py [> ...]
+
+Type in english commands in an input file according to the syntax below.
+The program will output the corresponding VHDL statement containing 10-bit codes along with the "when...else..." boilerplate statements, or error message if appropriate. 
+
+The output will be an appropriate VHDL expression designed to be assigned to the data signal in the pldrom.vhd file.
+
+The program prints to stdout by default but you can use the pipe function ">" to make it print to a certain output file.
+
+
+Syntax:
 
 move [[from] [acc/lr] / [bits]] to [dest]
-bin [add/sub/shift/xor/and/rotate] [src] [to/from/left/right/with/to] [dest]
+bin [add/sub/shift/xor/and/rotate] [src] [to/from/left/right/with] [dest]
 branch [to] xxxx
 branch [to] xxxx if src == 0
 
 
-Input "quit" or "exit" to quit
+Known Issue
 
+The current assembler can only concatenate the "when...else..." boilerplate statement with the 10-bit assembly code. It doesn't know when to stop using the boilerplate and put a semicolon after the assembly code.
+Please make sure to cut out the trailing "when ... else" statement and replace it with a semicolon in compliance with VHDL standard.
 '''
-
-import re
 
 
 def raiseError(message):
@@ -30,8 +37,7 @@ def raiseError(message):
 def translate(line):
 
     words = line.split(' ')
-    if words[0] == "quit" or words[0] == "exit":
-        exit()
+
     op = words[0]
     ans = ""
     if op == "move":
@@ -79,7 +85,7 @@ def translate(line):
 
     elif op == "bin":
         '''bin syntax:
-            bin [add/sub/shift/xor/and/rotate] [src] [to/from/left/right/with/to] [dest]'''
+            bin [add/sub/shift/xor/and/rotate] [src] [to/from/left/right/with] [dest]'''
         if len(words) != 5:
             raiseError("wrong number of args. check syntax in bin.")
     
@@ -184,9 +190,19 @@ def translate(line):
 
 
 def main():
-    while True:
-        line = input()
-        code = translate(line)
+    with open("assemblyinput.txt") as file:
+
+        line = file.readline().strip()
+        code = ""
+        lineNum = 0
+        while len(line) != 0:
+            # addr number padded to 4 digits
+            code += "\"" +  translate(line) + "\"" + " when addr = \"{0:0<4b}\" else".format(lineNum)
+            # add annotation to code
+            code += " -- " + line + "\n"
+            line = file.readline().strip()
+            lineNum += 1
+
         print(code)
 
 
